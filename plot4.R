@@ -1,58 +1,11 @@
 
-library (dplyr)
-library(data.table)
-library(lubridate)
+source ("hpcPlot.R", chdir=TRUE)  # loads data set, defines saveplot function
 
+no_plot <- TRUE
+source ("plot2.R", chdir=TRUE)
+source ("plot3.R", chdir=TRUE)
+no_plot <- FALSE
 
-readHPC <- function () {
- HPC <<- 
-   data.table (read.table("household_power_consumption.txt", header=TRUE, sep=";", na.strings="?", as.is=TRUE))
- 
- HPC <<- HPC %>% 
-    rename (date_txt = Date) %>%
-    mutate (Date = as.Date(date_txt,"%d/%m/%Y")) %>%
-    filter (Date >="2007-02-01") %>%
-    filter ("2007-02-02" >= Date)   
-}
-
-saveplot <- function (plot_f){
-  filename <- paste (as.character(substitute(plot_f)), ".png", sep="")
-  png(file=filename, width=480,height=480)
-  plot_f()  
-  dev.off()
-}
-
-plot1 <- function () {
-  with (HPC, 
-        hist (Global_active_power, 
-              col="red",
-              main = "Global Active Power", xlab = "Global Active Power (kilowatts)", ylab = "Frequency"))  
-}
-
-plot2 <- function (){
-  with (HPC, 
-        plot (Global_active_power, type = "l", col="black",xaxt = "n",
-              xlab="", ylab = "Global Active Power (kilowatts)")
-             )  
-  axis (1, c(0, length (HPC$Global_active_power)/2, length (HPC$Global_active_power)), c("Thu", "Fri", "Sat"))
-  
-}
-
-plot3 <- function () {
-  with (HPC, 
-        plot (Sub_metering_1, type = "l", col="black",xaxt = "n",
-              xlab="", ylab = "Energy sub metering"))  
-  with (HPC, 
-        lines (Sub_metering_2, type = "l", col="red",xaxt = "n",
-              xlab="", ylab = ""))  
-  with (HPC, 
-        lines (Sub_metering_3, type = "l", col="blue",xaxt = "n",
-              xlab="", ylab = ""))  
-  axis (1, c(0, length (HPC$Global_active_power)/2, length (HPC$Global_active_power)), c("Thu", "Fri", "Sat")) 
-  
-  legend ("topright", legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), 
-          col = c("black", "red", "blue"), lty = 1, cex=.75)
-}
 
 plot4b <- function () {
   with (HPC, 
@@ -60,7 +13,6 @@ plot4b <- function () {
               xlab="datetime", ylab = "Voltage")
   )  
   axis (1, c(0, length (HPC$Global_active_power)/2, length (HPC$Global_active_power)), c("Thu", "Fri", "Sat"))
-  
 }
 
 plot4d <- function () {
@@ -72,7 +24,6 @@ plot4d <- function () {
   
 }
 
-
 plot4 <- function () {
   par(mfrow=c(2,2))
   plot2()
@@ -81,8 +32,6 @@ plot4 <- function () {
   plot4d()
 }
 
-
-###############################
-
-readHPC()
-saveplot (plot4)
+if (!exists ("no_plot") || (exists ("no_plot") && !no_plot )){
+  saveplot (plot4)
+}
